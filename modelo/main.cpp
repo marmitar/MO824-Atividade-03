@@ -116,8 +116,6 @@ public:
         std::cout << "Execution time: " << elapsed << " secs" << std::endl;
         std::cout << "Variables: " << g.var_count() << std::endl;
         std::cout << "Constraints: " << g.constr_count() << std::endl;
-        std::cout << "    Linear: " << g.lin_constr_count() << std::endl;
-        std::cout << "    Quadratic: " << g.quad_constr_count() << std::endl;
         std::cout << "Similarity: " << g.similarity() << std::endl;
         std::cout << "Objective cost: " << g.solution_cost() << std::endl;
 

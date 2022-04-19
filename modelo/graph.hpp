@@ -94,14 +94,24 @@ private:
     }
 
     [[gnu::cold]]
+    inline GRBVar add_shared_edge(unsigned u, unsigned v) {
+        std::ostringstream name;
+        name << 'z' << '_' << this->vertices[u].id() << '_' << this->vertices[v].id();
+        auto ze = this->model.addVar(0., 1., 0.0, GRB_BINARY, name.str());
+
+        this->model.addConstr(this->vars[0][u][v], GRB_GREATER_EQUAL, ze);
+        return ze;
+    }
+
+    [[gnu::cold]]
     inline void add_constraint_similarity(double k) {
-        auto expr = GRBQuadExpr();
+        auto expr = GRBLinExpr();
         for (unsigned u = 0; u < this->order(); u++) {
             for (unsigned v = u + 1; v < this->order(); v++) {
-                expr += this->vars[0][u][v] * this->vars[1][u][v];
+                expr += this->add_shared_edge(u, v);
             }
         }
-        this->model.addQConstr(expr, GRB_GREATER_EQUAL, k);
+        this->model.addConstr(expr, GRB_GREATER_EQUAL, k);
     }
 
 public:
