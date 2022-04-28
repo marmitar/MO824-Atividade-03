@@ -34,3 +34,22 @@
     \[
         {\lambda_e^i}^{(t+1)} = \max\left\{0,~ {\lambda_e^i}^{(t)} + \alpha^{(t)} \left(z_e - {x_e^i}^{(t)}\right)\right\}
     \]
+
+\subsection{Limite Superior}
+
+    Maior custo quando $k = \abs{V}$, e o problema é equivalente ao TSP:
+    \[
+        Z_\text{UB} = \min_{\vec{X}} \sum_{e \in E} c_e x_e
+    \]
+
+    Sujeito à
+    \begin{align*}
+        \sum_{e \in \delta(v)} x_e &= 2
+            && &\forall v \in V \\
+        \sum_{e \in E(S)} x_e &\leq \abs{S} - 1
+            && &\forall S \subset V \\
+        x_e &\in \set{0, 1}
+            && &\forall e \in E
+    \end{align*}
+
+    Onde $x_e = x_e^1 = x_e^2$ e $c_e = c_e^1 + c_e^2$.
