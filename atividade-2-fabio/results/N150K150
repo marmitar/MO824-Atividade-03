@@ -1,0 +1,79 @@
+Set parameter LazyConstraints to value 1
+Set parameter TimeLimit to value 1800
+Gurobi Optimizer version 9.5.1 build v9.5.1rc2 (linux64)
+Thread count: 4 physical cores, 8 logical processors, using up to 8 threads
+Optimize a model with 33826 rows, 33525 columns and 134100 nonzeros
+Model fingerprint: 0xc376471d
+Variable types: 0 continuous, 33525 integer (33525 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 1e+00]
+  Objective range  [1e+00, 1e+02]
+  Bounds range     [1e+00, 1e+00]
+  RHS range        [1e+00, 2e+02]
+Presolve time: 0.14s
+Presolved: 33826 rows, 33525 columns, 134100 nonzeros
+Variable types: 0 continuous, 33525 integer (33525 binary)
+
+Deterministic concurrent LP optimizer: primal and dual simplex
+Showing first log only...
+
+Concurrent spin time: 0.00s
+
+Solved with dual simplex
+
+Root relaxation: objective 4.718000e+03, 20502 iterations, 3.67 seconds (4.07 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+     0     0 4718.00000    0   18          - 4718.00000      -     -    4s
+     0     0 4723.00000    0   18          - 4723.00000      -     -    4s
+     0     0 4724.50000    0   24          - 4724.50000      -     -    4s
+     0     0 4725.00000    0   57          - 4725.00000      -     -    5s
+     0     0 4749.50000    0   18          - 4749.50000      -     -    6s
+     0     0 4750.00000    0   81          - 4750.00000      -     -    6s
+     0     0 4750.00000    0   45          - 4750.00000      -     -    6s
+     0     0 4752.33333    0   27          - 4752.33333      -     -    6s
+     0     0 4752.33333    0   27          - 4752.33333      -     -    7s
+     0     0 4756.50000    0   18          - 4756.50000      -     -    7s
+     0     0 4756.50000    0   18          - 4756.50000      -     -    7s
+     0     0 4757.50000    0   24          - 4757.50000      -     -    8s
+     0     0 4757.66667    0   66          - 4757.66667      -     -    8s
+     0     0 4757.83333    0  102          - 4757.83333      -     -    8s
+     0     0 4772.50000    0   48          - 4772.50000      -     -    9s
+     0     0 4772.66667    0   87          - 4772.66667      -     -   10s
+     0     0 4776.00000    0   57          - 4776.00000      -     -   10s
+     0     0 4777.00000    0  147          - 4777.00000      -     -   11s
+     0     0 4777.33333    0   45          - 4777.33333      -     -   12s
+     0     0 4777.50000    0   66          - 4777.50000      -     -   12s
+     0     0 4777.50000    0   84          - 4777.50000      -     -   12s
+     0     0 4777.50000    0   84          - 4777.50000      -     -   16s
+     0     2 4777.50000    0   84          - 4777.50000      -     -   18s
+     1     4 4777.66667    1  120          - 4777.50000      -   136   26s
+     3     8 4778.00000    2   24          - 4777.50000      -  54.7   30s
+     7    10 4779.00000    3    -          - 4777.66667      -  39.9   35s
+    11    13 4780.12500    3   81          - 4777.66667      -  76.2   40s
+*   16    16               4    4780.0000000 4777.88889  0.04%   123   42s
+
+Cutting planes:
+  Zero half: 48
+  Lazy constraints: 28
+
+Explored 36 nodes (27778 simplex iterations) in 42.61 seconds (48.72 work units)
+Thread count was 8 (of 8 available processors)
+
+Solution count 1: 4780 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 4.780000000000e+03, best bound 4.780000000000e+03, gap 0.0000%
+
+User-callback calls 9566, time in user-callback 0.86 sec
+Total time in seconds:  42.623971
+Common edges = 300
+Optimal tour 1: [0, 105, 32, 61, 67, 38, 52, 75, 83, 40, 42, 74, 51, 108, 82, 58, 34, 50, 21, 47, 132, 35, 109, 117, 116, 7, 146, 28, 86, 141, 46, 139, 130, 88, 137, 64, 104, 144, 71, 79, 99, 24, 15, 20, 114, 136, 30, 97, 142, 33, 60, 48, 45, 93, 91, 145, 1, 44, 85, 98, 143, 84, 70, 129, 89, 100, 133, 18, 10, 19, 124, 12, 17, 123, 80, 112, 25, 56, 90, 96, 69, 135, 16, 138, 103, 118, 66, 2, 128, 125, 14, 3, 41, 49, 11, 39, 29, 23, 140, 27, 120, 147, 57, 115, 78, 59, 81, 101, 4, 122, 95, 31, 148, 73, 68, 149, 55, 111, 5, 131, 72, 110, 76, 63, 126, 94, 77, 102, 54, 53, 6, 36, 113, 62, 119, 37, 65, 106, 127, 121, 26, 8, 13, 87, 92, 9, 22, 107, 43, 134]
+Optimal tour 2: [0, 105, 32, 61, 67, 38, 52, 75, 83, 40, 42, 74, 51, 108, 82, 58, 34, 50, 21, 47, 132, 35, 109, 117, 116, 7, 146, 28, 86, 141, 46, 139, 130, 88, 137, 64, 104, 144, 71, 79, 99, 24, 15, 20, 114, 136, 30, 97, 142, 33, 60, 48, 45, 93, 91, 145, 1, 44, 85, 98, 143, 84, 70, 129, 89, 100, 133, 18, 10, 19, 124, 12, 17, 123, 80, 112, 25, 56, 90, 96, 69, 135, 16, 138, 103, 118, 66, 2, 128, 125, 14, 3, 41, 49, 11, 39, 29, 23, 140, 27, 120, 147, 57, 115, 78, 59, 81, 101, 4, 122, 95, 31, 148, 73, 68, 149, 55, 111, 5, 131, 72, 110, 76, 63, 126, 94, 77, 102, 54, 53, 6, 36, 113, 62, 119, 37, 65, 106, 127, 121, 26, 8, 13, 87, 92, 9, 22, 107, 43, 134]
+Optimal cost: 4780
+|V| = 150 
+k = 150 
+Optimal cost = 4779.999999999998 
+Solutions count = 1 
