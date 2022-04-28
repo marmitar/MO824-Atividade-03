@@ -1,0 +1,36 @@
+\subsection{Dual Langrangeano}
+
+    \[
+        \max_{\lambda \geq 0} \left\{
+            \min_{\vec{X}} Z_\text{LB}
+                = \sum_{i = 1}^2 \sum_{e \in E} \left(c_e^i x_e^i + \lambda_e^i \left(z_e - x_e^i\right)\right)
+        \right\}
+    \]
+
+    Sujeito à
+    \begin{align*}
+        \sum_{e \in \delta(v)} x_e^i &= 2
+            && &\forall v \in V,~ \forall i \in \set{1, 2} \\
+        \sum_{e \in E(S)} x_e^i &\leq \abs{S} - 1
+            && &\forall S \subset V,~ \forall i \in \set{1, 2} \\
+        \sum_{e \in E} z_e &\geq k \\
+        x_e^i, z_e &\in \set{0, 1}
+            && &\forall e \in E,~ \forall i \in \set{1, 2}
+    \end{align*}
+
+\subsection{Subgradiente}
+
+    \begin{align*}
+        {\lambda_e^i}^{(1)} = 1
+            && &\forall e \in E,~ \forall i \in \set{1, 2}
+    \end{align*}
+
+    Seja ${x_e^i}^{(t)}, {z_e}^{(t)}$ a solução para LLBP com $Z_\text{LB}^{(t)}$ mínimo. Então: \red{escolher $\pi$}
+    \[
+        \alpha^{(t)} = \pi \frac{Z_\text{UB} - Z_\text{LB}^{(t)}}{\sum_{i = 1}^2 \sum_{e \in E} \left(z_e - {x_e^i}^{(t)}\right)^2}
+    \]
+
+    E:
+    \[
+        {\lambda_e^i}^{(t+1)} = \max\left\{0,~ {\lambda_e^i}^{(t)} + \alpha^{(t)} \left(z_e - {x_e^i}^{(t)}\right)\right\}
+    \]
