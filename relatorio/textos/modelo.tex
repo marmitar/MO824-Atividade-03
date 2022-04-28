@@ -1,22 +1,22 @@
 \subsection{Dual Langrangeano}
 
     \[
-        \max_{\lambda \geq 0} \left\{
+        \max_{\lambda \geq 0} \left\{\begin{gathered}
             \min_{\vec{X}} Z_\text{LB}
-                = \sum_{i = 1}^2 \sum_{e \in E} \left(c_e^i x_e^i + \lambda_e^i \left(z_e - x_e^i\right)\right)
-        \right\}
+                = \sum_{i = 1}^2 \sum_{e \in E} \left(c_e^i x_e^i + \lambda_e^i \left(z_e - x_e^i\right)\right) \\
+            \\
+            \hspace{10pt}\begin{aligned}
+                \text{Sujeito a} \\
+                && \sum_{e \in \delta(v)} x_e^i &= 2
+                    && &\forall v \in V,~ \forall i \in \set{1, 2} \\
+                && \sum_{e \in E(S)} x_e^i &\leq \abs{S} - 1
+                    && &\forall S \subset V,~ \forall i \in \set{1, 2} \\
+                && \sum_{e \in E} z_e &\geq k \\
+                && x_e^i, z_e &\in \set{0, 1}
+                    && &\forall e \in E,~ \forall i \in \set{1, 2}
+            \end{aligned}\hspace{20pt}
+        \end{gathered}\right\}
     \]
-
-    Sujeito à
-    \begin{align*}
-        \sum_{e \in \delta(v)} x_e^i &= 2
-            && &\forall v \in V,~ \forall i \in \set{1, 2} \\
-        \sum_{e \in E(S)} x_e^i &\leq \abs{S} - 1
-            && &\forall S \subset V,~ \forall i \in \set{1, 2} \\
-        \sum_{e \in E} z_e &\geq k \\
-        x_e^i, z_e &\in \set{0, 1}
-            && &\forall e \in E,~ \forall i \in \set{1, 2}
-    \end{align*}
 
 \subsection{Subgradiente}
 
@@ -25,7 +25,7 @@
             && &\forall e \in E,~ \forall i \in \set{1, 2}
     \end{align*}
 
-    Seja ${x_e^i}^{(t)}, {z_e}^{(t)}$ a solução para LLBP com $Z_\text{LB}^{(t)}$ mínimo. Então: \red{escolher $\pi$}
+    Seja ${x_e^i}^{(t)}, {z_e}^{(t)}$ a solução para LLBP com $Z_\text{LB}^{(t)}$ mínimo. Então: \red{escolher $0 < \pi \leq 2$}
     \[
         \alpha^{(t)} = \pi \frac{Z_\text{UB} - Z_\text{LB}^{(t)}}{\sum_{i = 1}^2 \sum_{e \in E} \left(z_e - {x_e^i}^{(t)}\right)^2}
     \]
@@ -42,7 +42,7 @@
         Z_\text{UB} = \min_{\vec{X}} \sum_{e \in E} c_e x_e
     \]
 
-    Sujeito à
+    Sujeito a
     \begin{align*}
         \sum_{e \in \delta(v)} x_e &= 2
             && &\forall v \in V \\
