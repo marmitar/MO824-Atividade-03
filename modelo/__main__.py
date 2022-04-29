@@ -4,6 +4,7 @@ from typing import Iterable, TypeVar
 
 import gurobipy as gp
 from .model import Point
+from .tsp import EdgeDict
 from .kstsp import ksTSP
 
 
@@ -22,29 +23,38 @@ def two_tsp(vertices: Iterable[tuple[Point, Point]], k: int):
     return problem
 
 
-def iter_grad(problem: ksTSP, pi: float, l0: float, tol=1e-2):
+def zero(first: Iterable[EdgeDict[float]], second: Iterable[EdgeDict[float]], tol: float):
+    for df, ds in zip(first, second):
+        for xf, xs in zip(df.values(), ds.values()):
+            if abs(xf - xs) > tol:
+                return False
+    return True
+
+
+def iter_grad(problem: ksTSP, pi: float, l0: float, tol: float=1e-8):
     Zub = problem.upper_bound()
     print('Upper bound:', Zub)
 
+    alpha = 0.0
     lm = problem.initial_multipliers(l0)
-    Zlb_prev = Zub
-    Zlb = problem.solution(lm)
-    yield Zlb
+    while True:
+        Zlb = problem.solution(lm)
+        yield Zlb
 
-    while abs(Zlb - Zlb_prev) > tol:
         g = problem.subgradient()
-        alpha = pi * (Zub - Zlb) / sum(value * value for gi in g for value in gi.values())
+        alpha = pi * (Zub - Zlb) / sum(value**2 for gi in g for value in gi.values())
 
-        lm = tuple(
+        next_lm = tuple(
             gp.tupledict({
                 uv: max(0, lme + alpha * g[i][uv])
                 for uv, lme in lmi.items()
             })
             for i, lmi in enumerate(lm)
         )
-
-        Zlb_prev, Zlb = Zlb, problem.solution(lm)
-        yield Zlb
+        if zero(lm, next_lm, tol):
+            return
+        else:
+            lm = next_lm
 
 
 def subgradient(vertices: Iterable[tuple[Point, Point]], k: int, pi: float, max_iter: int, l0: float):
@@ -59,17 +69,22 @@ def subgradient(vertices: Iterable[tuple[Point, Point]], k: int, pi: float, max_
 
 
 parser = ArgumentParser('modelo')
-parser.add_argument('filename')
-parser.add_argument('-2', '--2TSP', action='store_true', dest='twotsp')
-parser.add_argument('-k', type=int, default=0)
-parser.add_argument('-v', '--vertices', type=int, default=250)
-parser.add_argument('-pi', type=float, default=1.0)
-parser.add_argument('-m', '--max-iter', type=int, default=1_000)
-parser.add_argument('-l0', type=float, default=1.0)
+parser.add_argument('-2', '--2TSP', action='store_true', dest='twotsp',
+    help='use the model without the lagrangean relaxation')
+parser.add_argument('-k', type=int, default=0,
+    help='similarity (default: 0)')
+parser.add_argument('-v', '--vertices', type=int, default=100,
+    help='graph order (default: 100)')
+parser.add_argument('-pi', type=float, default=1.0,
+    help='step size multiplier (default: 1.0)')
+parser.add_argument('-m', '--max-iter', type=int, default=100,
+    help='max number of iterations on subgradient method (default: 100)')
+parser.add_argument('-l0', type=float, default=0.0,
+    help='initial lambda value (default: 0.0)')
 args = parser.parse_intermixed_args()
 
 
-vertices = take(Point.read(args.filename), args.vertices)
+vertices = take(Point.read(), args.vertices)
 start = time()
 if args.twotsp:
     problem = two_tsp(vertices, args.k)
