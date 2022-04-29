@@ -39,14 +39,15 @@ class TSP:
     def subtour(self, solution: EdgeDict[float]):
         edges = gp.tuplelist(uv for uv, link in solution.items() if link > 0.5)
         unvisited = set(self.vertices)
-        min_cycle = self.full_cycle
+        min_cycle = self.full_cycle()
 
         while unvisited:
             cycle: list[int] = []
-            neighbors = unvisited
+            neighbors = set(unvisited)
             while neighbors:
                 u = neighbors.pop()
                 cycle.append(u)
+                unvisited.remove(u)
                 neighbors = {v for _, v in edges.select(u, '*') if v in unvisited}
 
             if len(cycle) < len(min_cycle):
@@ -72,6 +73,7 @@ class TSP:
     @staticmethod
     def solution(size: int, weight: Callable[[int, int], float]):
         problem = TSP.from_model(size, Model(name='TSP'))
+        problem.model.update()
         problem.model.setObjective(problem.objective(weight), gp.GRB.MINIMIZE)
         problem.model.optimize(lambda _, where: problem.subtour_elim(where))
 

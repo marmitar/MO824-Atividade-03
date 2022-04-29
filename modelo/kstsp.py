@@ -22,6 +22,18 @@ class ksTSP:
     def model(self):
         return self.cycle1.model
 
+    @property
+    def num_constrs(self):
+        return self.model.NumConstrs
+
+    @property
+    def num_vars(self):
+        return self.model.NumVars
+
+    @property
+    def min_cost(self):
+        return self.model.ObjVal
+
     def pairs(self):
         return self.cycle1.pairs()
 
@@ -89,4 +101,4 @@ class ksTSP:
         if self.model.SolCount < 1:
             raise ValueError('could not find a solution', self)
 
-        return self.model.ObjVal
+        return self.min_cost

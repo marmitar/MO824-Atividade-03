@@ -18,7 +18,8 @@ def take(it: Iterable[T], n: int):
 def two_tsp(vertices: Iterable[tuple[Point, Point]], k: int):
     problem = ksTSP.dual_model(vertices, k)
     problem.add_shared_edge_constraint()
-    return problem.solution()
+    problem.solution()
+    return problem
 
 
 def iter_grad(problem: ksTSP, pi: float, l0: float, tol=1e-5):
@@ -43,10 +44,10 @@ def iter_grad(problem: ksTSP, pi: float, l0: float, tol=1e-5):
 def subgradient(vertices: Iterable[tuple[Point, Point]], k: int, pi: float, max_iter: int, l0: float):
     problem = ksTSP.dual_model(vertices, k)
 
-    for i, Zlb in enumerate(iter_grad(problem, pi, l0)):
+    for i, _ in enumerate(iter_grad(problem, pi, l0)):
         if i > max_iter:
             raise ValueError('max iteration reached', i)
-    return Zlb
+    return problem
 
 
 parser = ArgumentParser('modelo')
@@ -63,10 +64,12 @@ args = parser.parse_intermixed_args()
 vertices = take(Point.read(args.filename), args.vertices)
 start = time()
 if args.twotsp:
-    Zlb = two_tsp(vertices, args.k)
+    problem = two_tsp(vertices, args.k)
 else:
-    Zlb = subgradient(vertices, args.k, args.pi, args.max_iter, args.l0)
+    problem = subgradient(vertices, args.k, args.pi, args.max_iter, args.l0)
 elapsed = time() - start
 
-print(f'Minimum: {Zlb}')
+print(f'Minimum Cost: {problem.min_cost}')
+print(f'Num Vars: {problem.num_vars}')
+print(f'Num Consts: {problem.num_constrs}')
 print(f'Execution time: {elapsed} s')
