@@ -22,8 +22,9 @@ def two_tsp(vertices: Iterable[tuple[Point, Point]], k: int):
     return problem
 
 
-def iter_grad(problem: ksTSP, pi: float, l0: float, tol=1e-5):
+def iter_grad(problem: ksTSP, pi: float, l0: float, tol=1e-2):
     Zub = problem.upper_bound()
+    print('Upper bound:', Zub)
 
     lm = problem.initial_multipliers(l0)
     Zlb_prev = Zub
@@ -33,9 +34,14 @@ def iter_grad(problem: ksTSP, pi: float, l0: float, tol=1e-5):
     while abs(Zlb - Zlb_prev) > tol:
         g = problem.subgradient()
         alpha = pi * (Zub - Zlb) / sum(value * value for gi in g for value in gi.values())
-        for i, lmi in enumerate(lm):
-            lmie = gp.tupledict({lme + alpha * g[i][uv]  for uv, lme in lmi.items()})
-            lm[i] = max(0, lmie)
+
+        lm = tuple(
+            gp.tupledict({
+                uv: max(0, lme + alpha * g[i][uv])
+                for uv, lme in lmi.items()
+            })
+            for i, lmi in enumerate(lm)
+        )
 
         Zlb_prev, Zlb = Zlb, problem.solution(lm)
         yield Zlb
@@ -44,7 +50,9 @@ def iter_grad(problem: ksTSP, pi: float, l0: float, tol=1e-5):
 def subgradient(vertices: Iterable[tuple[Point, Point]], k: int, pi: float, max_iter: int, l0: float):
     problem = ksTSP.dual_model(vertices, k)
 
-    for i, _ in enumerate(iter_grad(problem, pi, l0)):
+    for i, Zlb in enumerate(iter_grad(problem, pi, l0)):
+        print(f'Lower bound (it {i}):', Zlb)
+
         if i > max_iter:
             raise ValueError('max iteration reached', i)
     return problem
