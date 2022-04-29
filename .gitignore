@@ -1,3 +1,4 @@
 build/
 relatorio.pdf
-modelo/modelo
+cpp/modelo
+__pycache__

@@ -1,77 +1,80 @@
-from __future__ import annotations
 from dataclasses import dataclass
 from itertools import combinations
-from math import ceil, sqrt
-from typing import cast, Sequence, TypeVar
+from typing import Callable, TypeVar
 
 import gurobipy as gp
 from .model import Model
 
 
+Value = TypeVar('Value')
+EdgeDict = gp.tupledict[tuple[int, int], Value]
+
+
 @dataclass(frozen=True)
-class Point:
-    x: int
-    y: int
+class TSP:
+    size: int
+    model: Model
+    edges: EdgeDict[gp.Var]
 
-    def dist(self, other: Point):
-        return ceil(sqrt((self.x - other.x)**2 + (self.y - other.y)**2))
+    @property
+    def vertices(self):
+        return range(self.size)
 
+    def pairs(self):
+        return combinations(self.vertices, 2)
 
-T = TypeVar('T')
-EdgeDict = gp.tupledict[tuple[int, int], T]
+    @staticmethod
+    def from_model(size: int, model: Model, *, varname: str = 'e'):
+        pairs = combinations(range(size), 2)
+        edges = model.addVars(pairs, name=varname, vtype=gp.GRB.BINARY)
+        for (u, v), var in edges.items():
+            edges[v, u] = var
 
+        model.addConstrs(edges.sum(u, '*') == 2 for u in range(size))
+        return TSP(size, model, edges)
 
-def build_tsp(coords: Sequence[Point], varname: str = 'e', model: Model | None = None):
-    if model is None:
-        model = Model(name='TSP')
+    def full_cycle(self):
+        return tuple(self.vertices) + (0,)
 
-    dist = {
-        (u, v): pu.dist(pv)
-        for (u, pu), (v, pv) in combinations(enumerate(coords), 2)
-    }
+    def subtour(self, solution: EdgeDict[float]):
+        edges = gp.tuplelist(uv for uv, link in solution.items() if link > 0.5)
+        unvisited = set(self.vertices)
+        min_cycle = self.full_cycle
 
-    edges = model.addVars(dist.keys(), name=varname, vtype=gp.GRB.BINARY)
-    for (u, v), var in edges.items():
-        edges[v, u] = var
+        while unvisited:
+            cycle: list[int] = []
+            neighbors = unvisited
+            while neighbors:
+                u = neighbors.pop()
+                cycle.append(u)
+                neighbors = {v for _, v in edges.select(u, '*') if v in unvisited}
 
-    model.addConstrs(edges.sum(u, '*') for u in range(len(coords)))
+            if len(cycle) < len(min_cycle):
+                min_cycle = tuple(cycle)
+        return min_cycle
 
-    return model, cast(EdgeDict[gp.Var], edges)
-
-
-def subtour(solution: EdgeDict[float], size: int):
-    edges = gp.tuplelist(uv for uv, link in solution.items() if link > 0.5)
-
-    unvisited = set(range(size))
-    min_cycle = tuple(range(size + 1))
-
-    while unvisited:
-        cycle: list[int] = []
-        neighbors = unvisited
-        while neighbors:
-            u = neighbors.pop()
-            cycle.append(u)
-            neighbors = {v for _, v in edges.select(u, '*') if v in unvisited}
-
-        if len(cycle) < len(min_cycle):
-            min_cycle = tuple(cycle)
-    return min_cycle
-
-
-def subtour_elim(edges: EdgeDict[gp.Var], size: int):
-    def callback(model: Model, where: int):
+    def subtour_elim(self, where: int):
         if where == gp.GRB.Callback.MIPSOL:
-            solution = model.cbGetSolution(edges)
-            tour = subtour(solution, size)
+            solution = self.model.cbGetSolution(self.edges)
+            tour = self.subtour(solution)
 
-            if len(tour) < size:
-                model.cbLazy(
-                    gp.quicksum(edges[u, v] for u, v in combinations(tour, 2)),
-                    gp.GRB.LESS_EQUAL,
-                    len(tour) - 1
-                )
+            if len(tour) < self.size:
+                edge_count = gp.quicksum(self.edges[u, v] for u, v in combinations(tour, 2))
+                self.model.cbLazy(edge_count <= len(tour) - 1)
 
-    return callback
+    def objective(self, weight: Callable[[int, int], float]):
+        return gp.quicksum(weight(u, v) * self.edges[u, v] for u, v in self.pairs())
 
+    @property
+    def minimum_cost(self):
+        return self.model.ObjVal
 
-# def solve_tsp(coords: Sequence[Point], )
+    @staticmethod
+    def solution(size: int, weight: Callable[[int, int], float]):
+        problem = TSP.from_model(size, Model(name='TSP'))
+        problem.model.setObjective(problem.objective(weight), gp.GRB.MINIMIZE)
+        problem.model.optimize(lambda _, where: problem.subtour_elim(where))
+
+        if problem.model.SolCount < 1:
+            raise ValueError('could not find a solution', problem)
+        return problem
