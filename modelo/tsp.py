@@ -1,13 +1,13 @@
 from dataclasses import dataclass
 from itertools import combinations
-from typing import Callable, TypeVar
+from typing import Callable, TypeAlias, TypeVar
 
 import gurobipy as gp
 from .model import Model
 
 
 Value = TypeVar('Value')
-EdgeDict = gp.tupledict[tuple[int, int], Value]
+EdgeDict: TypeAlias = gp.tupledict[tuple[int, int], Value]
 
 
 @dataclass(frozen=True)

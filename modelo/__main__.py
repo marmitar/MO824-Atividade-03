@@ -8,12 +8,14 @@ from .tsp import EdgeDict
 from .kstsp import ksTSP
 
 
-T = TypeVar('T')
+Item = TypeVar('Item')
 
-def take(it: Iterable[T], n: int):
+def take(it: Iterable[Item], n: int):
     for i, value in enumerate(it):
         if i < n:
             yield value
+        else:
+            return
 
 
 def two_tsp(vertices: Iterable[tuple[Point, Point]], k: int):
@@ -43,6 +45,7 @@ def iter_grad(problem: ksTSP, pi: float, l0: float, tol: float=1e-8):
 
         g = problem.subgradient()
         alpha = pi * (Zub - Zlb) / sum(value**2 for gi in g for value in gi.values())
+        pi = 0.99 * pi
 
         next_lm = tuple(
             gp.tupledict({
@@ -76,7 +79,7 @@ parser.add_argument('-k', type=int, default=0,
 parser.add_argument('-v', '--vertices', type=int, default=100,
     help='graph order (default: 100)')
 parser.add_argument('-pi', type=float, default=1.0,
-    help='step size multiplier (default: 1.0)')
+    help='initial step size multiplier (default: 1.0)')
 parser.add_argument('-m', '--max-iter', type=int, default=100,
     help='max number of iterations on subgradient method (default: 100)')
 parser.add_argument('-l0', type=float, default=0.0,
